@@ -1,1 +1,3 @@
+**/node_modules
 src/basic/keys.h
+src/server/keys.js

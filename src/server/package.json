@@ -1,0 +1,14 @@
+{
+  "name": "bicycletracking-server",
+  "version": "0.1.0",
+  "description": "server of bicycle tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Robert Salzer <salzer@gmx.ch>",
+  "license": "MIT",
+  "dependencies": {
+    "ttn": "^2.0.1"
+  }
+}
