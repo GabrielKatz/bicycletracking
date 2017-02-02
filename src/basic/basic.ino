@@ -61,6 +61,7 @@ void loop() {
       if (gps.location.isValid()){
         transmit_coords(gps.location.lat(), gps.location.lng());
       }
+      break;
     }
   }
   if(receivedBikeKillSignal()){
