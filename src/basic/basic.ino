@@ -61,21 +61,13 @@ void loop() {
       if (gps.location.isValid()){
         transmit_coords(gps.location.lat(), gps.location.lng());
       }
-      else{
-        Serial.println("GPS location not valid");
-      }
     }
-    else {
-      Serial.println("GPS location could not be encoded");
-    }
-  }
-  else{
-    Serial.println("No GPS Received");
   }
   if(receivedBikeKillSignal()){
     Serial.println("Deactivating Bike...");
   }
-  delay(20000);
+  Serial.println("end of loop...");
+  delay(5000);
 }
 
 boolean receivedBikeKillSignal() {
