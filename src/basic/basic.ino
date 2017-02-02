@@ -55,19 +55,22 @@ void setup() {
 // the loop routine runs over and over again forever:
 void loop() {
   Serial.println("starting loop...");
+  led_on();
   while (gpsSerial.available() > 0){
     if (gps.encode(gpsSerial.read())){
       displayInfo();
       if (gps.location.isValid()){
         transmit_coords(gps.location.lat(), gps.location.lng());
+        delay(5000);
+        break;
       }
-      break;
     }
   }
   if(receivedBikeKillSignal()){
     Serial.println("Deactivating Bike...");
   }
   Serial.println("end of loop...");
+  led_off();
   delay(5000);
 }
 
