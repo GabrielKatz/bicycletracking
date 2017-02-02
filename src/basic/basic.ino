@@ -32,7 +32,9 @@ void setup() {
   Serial.print("Microchip RN2xx3 version number: ");
   Serial.println(myLora.sysver());
 
-  myLora.initABP(devAddr, appSKey, nwkSKey);
+  if(!myLora.initABP(devAddr, appSKey, nwkSKey)){
+    Serial.println("Could not connect to LoRaWAN network");
+  }
 
   led_off();
   delay(2000);
@@ -40,13 +42,19 @@ void setup() {
 
 // the loop routine runs over and over again forever:
 void loop() {
-  led_on();
   Serial.println("TXing");
-
   myLora.txUncnf("X");
 
-  led_off();
-
+  String response = myLora.getRx();
+  if(response && response.length() > 0) {
+  Serial.println("Response: " + response);
+    if(response.toInt() == 31) {
+      led_on();
+    }
+    else{
+      led_off();
+    }
+  }
   delay(20000);
 }
 
