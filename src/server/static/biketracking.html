@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.css">
     <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet-src.js"></script>
     <script src="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.js"></script>
+	<script
+  		src="https://code.jquery.com/jquery-3.1.1.min.js"
+  		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  		crossorigin="anonymous"></script>
 	<style>
 		.leaflet-control-layers{ 
 			font-size: 15px;
@@ -216,8 +220,12 @@ basemaps["Luftbild Hybrid 2013"].addTo(map);
 
 map.setView([47.3854, 8.5215], 26);
 
-var latlngs = [[47.3854, 8.5215], [47.3851, 8.521], [47.3849, 8.5207], [47.3849, 8.5208]];
-var polyline = L.polyline(latlngs, {color: '#cc3333', weight: 3, opacity: 0.9}).addTo(map);
+$.get('./coords/', (data) => {
+	for(device in data){
+		let deviceCoords = data[device];
+		var polyline = L.polyline(deviceCoords.map((entry) => [entry.lat, entry.lng]), {color: '#cc3333', weight: 3, opacity: 0.9}).addTo(map);
+	}
+})
 	
 	map.attributionControl.addAttribution("Geocoding: &copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors");
 	
