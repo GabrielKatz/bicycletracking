@@ -19,6 +19,13 @@ const app = express();
 app.get('*', (req, res) => {
   res.send(locationByDevice);
 });
+
+app.post('shutdown/:id', (req, res) => {
+  const deviceId = req.params.id;
+  let response = i % 3? '0': '1';
+  client.send(deviceId, Buffer.from(response, 'ascii'));
+});
+
 app.listen(port, function(err) {
   if (err) {
     console.log(err);
