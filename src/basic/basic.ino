@@ -14,6 +14,8 @@ rn2xx3 myLora(myLoraSerial);
 // The TinyGPS++ object
 TinyGPSPlus gps;
 
+int lastExecutionMillis = 0;
+int lastSendMillis = 0;
 // Setup routine runs once when you press reset
 void setup() {
   pinMode(13, OUTPUT);
@@ -49,29 +51,35 @@ void setup() {
   Serial.println("Initialized GPS");
   
   led_off();
-  delay(2000);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
-  Serial.println("starting loop...");
+  int currentMillis = millis(); 
+
+  //if(currentMillis - lastExecutionMillis < 5000){
+  //  return;
+  //}
+  lastExecutionMillis = currentMillis; 
   led_on();
-  while (gpsSerial.available() > 0){
+  int available = gpsSerial.available();
+  if(available == 0)
+    return;
+  Serial.println("available bytes from gps: " + String(available, DEC));
+  while (available > 0){
     if (gps.encode(gpsSerial.read())){
       displayInfo();
-      if (gps.location.isValid()){
+      if (gps.location.isValid() && currentMillis - lastSendMillis > 30000){
         transmit_coords(gps.location.lat(), gps.location.lng());
-        delay(5000);
-        break;
       }
+      break;
     }
+    available = gpsSerial.available();
   }
   if(receivedBikeKillSignal()){
     Serial.println("Deactivating Bike...");
   }
-  Serial.println("end of loop...");
   led_off();
-  delay(5000);
 }
 
 boolean receivedBikeKillSignal() {
@@ -84,6 +92,7 @@ boolean receivedBikeKillSignal() {
 }
 
 void transmit_coords(double float_latitude, double float_longitude){
+  Serial.println("Transimitting coords...");
   uint8_t coords[6]; // 6*8 bits = 48
   int32_t lat = float_latitude * 10000;
   int32_t lon = float_longitude * 10000;
