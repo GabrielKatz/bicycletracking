@@ -73,6 +73,7 @@ void loop() {
     if (gps.encode(gpsSerial.read())){
       displayInfo();
       if (gps.location.isValid() && currentMillis - lastSendMillis > 30000){
+        lastSendMillis = currentMillis;
         transmit_coords(gps.location.lat(), gps.location.lng());
       }
       break;
@@ -108,7 +109,11 @@ void transmit_coords(double float_latitude, double float_longitude){
   coords[3] = lon;
   coords[4] = lon >> 8;
   coords[5] = lon >> 16;
-  myLora.txBytes(coords, sizeof(coords));
+  TX_RETURN_TYPE result = myLora.txBytes(coords, sizeof(coords));
+  if(result == TX_FAIL)
+  {
+    Serial.println("Failed to send data!");
+  }
 }
 void led_on()
 {
