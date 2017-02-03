@@ -1,0 +1,234 @@
+﻿<html>
+<head>
+	<meta charset=utf-8 />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Open Data Maps Stadt / Kanton Zürich</title>
+	    <!-- Load Leaflet from CDN-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.css">
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet-src.js"></script>
+    <script src="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.js"></script>
+	<style>
+		.leaflet-control-layers{ 
+			font-size: 15px;
+		}
+	</style>
+	<!-- Esri Leaflet Geocoder -->
+	<script src="lib/proj4.js"></script>
+	<script src="lib/proj4leaflet.js"></script>
+</head>
+<body>
+	<div id="mapid" style="position: absolute;
+	left: 0px;
+	top: 0px;
+	height: 100%;
+	width: 100%;"></div>
+<script> 
+	
+    var res = [4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250, 1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5, 0.25, 0.125, 0.1, 0.05];
+    
+    
+    crs = new L.Proj.CRS('EPSG:2056', "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs", {
+        resolutions: res,
+        origin: [2420000, 1350000]  // origin for WMTS tiles!!
+    });
+
+
+	map = new L.Map('mapid', {
+		crs: crs
+	});
+
+var attribution = '<a href="https://www.stadt-zuerich.ch/portal/de/index/ogd.html" target="_blank">Open Data Zürich</a>';
+var attributionKanton = '<a href="http://www.are.zh.ch/internet/baudirektion/are/de/geoinformation/geodaten_uebersicht/Open_Data_Kanton_Zuerich.html" target="_blank">Open Data Kanton Zürich</a>';
+var wmsUrlZh = 'http://www.gis.stadt-zuerich.ch/maps/services/wms/WMS-ZH-STZH-OGD/MapServer/WMSServer?';
+
+var basemaps = {
+    'Luftbild 2013': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_2013',
+			format: 'image/png',
+ 			maxZoom: 28,
+ 			dpi: 96,
+			attribution: attribution
+    }),
+        'Luftbild 2011': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_2011',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+                'Luftbild 2003': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_2003',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+                'Luftbild 1999': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_1999',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+                'Luftbild 1995': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_1995',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+             'Luftbild 1990': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_1990',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+         'Luftbild 1985': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_1985',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+        'Luftbild 1980': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_1980',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    
+        'Luftbild 1976': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Luftbild_1976',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+        'Luftbild Hybrid 2013': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'LuftbildHybrid_2013',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),    
+         'Stadtplan': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Stadtplan',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+
+         'Übersichtsplan 2015': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Uebersichtsplan_2015',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+    	'Stadtplan 1900': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Stadtplan_1900',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+        	'Stadtplan 1864': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Stadtplan_1864',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+        	'Stadtplan 1860': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Stadtplan_1860',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+	      'Stadtplan 1793': L.tileLayer.wms(wmsUrlZh, {
+			layers: 'Stadtplan_1793',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attribution,
+    }),
+	      'Orthofoto Kt.ZH Frühjahr 2015/16': L.tileLayer.wms('http://wms.zh.ch/OrthoZHWMS?', {
+			layers: 'ortho_sp',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attributionKanton,
+    }),
+	      'Wildkarte (1850) Kanton ZH': L.tileLayer.wms('http://wms.zh.ch/WildkarteZHWMS?', {
+			layers: 'WildkarteZHWMS',
+			format: 'image/png',
+ 			maxZoom: 28,
+			attribution: attributionKanton,
+    })
+};
+
+var overlays = {
+	'Stadtkreis': 	L.tileLayer.wms(wmsUrlZh, {
+					layers: 'Stadtkreis',
+					format: 'image/png',
+					opacity: 0.5,
+ 					maxZoom: 28,
+					attribution: attribution,
+    }),
+    'Stadtquartier': 	L.tileLayer.wms(wmsUrlZh, {
+					layers: 'Stadtquartier',
+					format: 'image/png',
+					opacity: 0.5,
+ 					maxZoom: 28,
+					attribution: attribution,
+    }),
+    'Statistisches Quartier': 	L.tileLayer.wms(wmsUrlZh, {
+					layers: 'StatistischesQuartier',
+					format: 'image/png', 
+					opacity: 0.5,
+ 					maxZoom: 28,
+					attribution: attribution,
+    }),
+	'Veloweg': 	L.tileLayer.wms(wmsUrlZh, {
+					layers: 'Veloweg',
+					format: 'image/png',
+					opacity: 0.5,
+ 					maxZoom: 28,
+					attribution: attribution,
+    }),
+	'Fussweg': 	L.tileLayer.wms(wmsUrlZh, {
+					layers: 'Fussweg',
+					format: 'image/png',
+					opacity: 0.5,
+ 					maxZoom: 28,
+					attribution: attribution,
+    }),
+   	'Fussgängerzone': 	L.tileLayer.wms(wmsUrlZh, {
+					layers: 'Fussgaengerzone',
+					format: 'image/png',
+					opacity: 0.5,
+ 					maxZoom: 28,
+					attribution: attribution,
+    })
+    
+};
+
+// request=GetMap&version=1.3.0&service=WMS&format=image%2Fpng&transparent=true&crs=EPSG%3A2056&bbox=2683467.0161223672%2C1246114.6544517102%2C2683737.9499970553%2C1246385.5883263983&layers=Luftbild_2013&styles=&width=512&height=512&dpi=96
+
+L.control.layers(basemaps, overlays).addTo(map);
+
+basemaps["Luftbild Hybrid 2013"].addTo(map);
+
+map.setView([47.3854, 8.5215], 26);
+
+var latlngs = [[47.3854, 8.5215], [47.3851, 8.521], [47.3849, 8.5207], [47.3849, 8.5208]];
+var polyline = L.polyline(latlngs, {color: '#cc3333', weight: 3, opacity: 0.9}).addTo(map);
+	
+	map.attributionControl.addAttribution("Geocoding: &copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors");
+	
+	L.easyButton('<b>ZH</b>', function(btn, map){
+    map.setView([47.366989, 8.545079], 20);
+	}).addTo(map);
+	
+	L.easyButton('<b>CH</b>', function(btn, map){
+    map.setView([46.799558, 8.235897], 16);
+	}).addTo(map);
+
+</script>
+</body>
+</html>
