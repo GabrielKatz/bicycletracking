@@ -109,11 +109,13 @@ void transmit_coords(double float_latitude, double float_longitude){
   coords[3] = lon;
   coords[4] = lon >> 8;
   coords[5] = lon >> 16;
+  myLoraSerial.listen();
   TX_RETURN_TYPE result = myLora.txBytes(coords, sizeof(coords));
   if(result == TX_FAIL)
   {
     Serial.println("Failed to send data!");
   }
+  gpsSerial.listen();
 }
 void led_on()
 {
