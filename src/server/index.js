@@ -22,7 +22,7 @@ app.get('*', (req, res) => {
 
 app.post('shutdown/:id', (req, res) => {
   const deviceId = req.params.id;
-  let response = i % 3? '0': '1';
+  let response = '1';
   client.send(deviceId, Buffer.from(response, 'ascii'));
 });
 
