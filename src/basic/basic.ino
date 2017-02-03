@@ -16,10 +16,14 @@ TinyGPSPlus gps;
 
 int lastExecutionMillis = 0;
 int lastSendMillis = 0;
+int buzzerPin = 5; 
 // Setup routine runs once when you press reset
 void setup() {
   pinMode(13, OUTPUT);
   led_on();
+  pinMode(buzzerPin, OUTPUT); //Set buzzerPin as output
+  //beep(500); //Beep
+  //beep(50);
 
   // Open serial communications and wait for port to open:
   Serial.begin(57600);
@@ -52,6 +56,14 @@ void setup() {
   
   led_off();
   delay(2000);
+}
+
+void beep(unsigned char delayms) { //creating function
+  analogWrite(buzzerPin, 20); //Setting pin to high
+  delay(delayms); //Delaying
+  analogWrite(buzzerPin ,0); //Setting pin to LOW
+  delay(delayms); //Delaying
+  
 }
 
 // the loop routine runs over and over again forever:
