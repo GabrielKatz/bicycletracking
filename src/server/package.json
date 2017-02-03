@@ -4,11 +4,13 @@
   "description": "server of bicycle tracker",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "Robert Salzer <salzer@gmx.ch>",
   "license": "MIT",
   "dependencies": {
+    "express": "^4.14.1",
+    "open": "0.0.5",
     "ttn": "^2.0.1"
   }
 }
