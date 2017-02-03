@@ -51,6 +51,7 @@ void setup() {
   Serial.println("Initialized GPS");
   
   led_off();
+  delay(2000);
 }
 
 // the loop routine runs over and over again forever:
@@ -61,10 +62,12 @@ void loop() {
   //  return;
   //}
   lastExecutionMillis = currentMillis; 
-  led_on();
   int available = gpsSerial.available();
-  if(available == 0)
+  if(available == 0){
     return;
+  }
+  led_on();
+    
   Serial.println("available bytes from gps: " + String(available, DEC));
   while (available > 0){
     if (gps.encode(gpsSerial.read())){
