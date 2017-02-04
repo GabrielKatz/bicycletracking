@@ -53,7 +53,7 @@ app.get('/bikes/', (req, res) => {
     let deviceInfos = JSON.parse(body).filter(el => el.lat && el.lng).reduce((prev, message) => {
       let timeObject = {
         id: message.device_id,
-        status: 'ok',
+        status: message.killed? 'error': message.outOfBounds? 'warning': 'ok',
         type: 'm-bike',
         lastSeen: message.time,
         coords: [message.lat, message.lng]
