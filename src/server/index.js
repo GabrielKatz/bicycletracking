@@ -48,6 +48,7 @@ app.post('/shutdown/:id', (req, res) => {
   const deviceId = req.params.id;
   let response = '1';
   client.send(deviceId, Buffer.from(response, 'ascii'));
+  res.sendStatus(204);
 });
 
 app.listen(port, function(err) {
