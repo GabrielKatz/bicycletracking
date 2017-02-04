@@ -4,8 +4,10 @@
 #include "keys.h"
 SoftwareSerial myLoraSerial(7, 8); // RX, TX
 #define RST  2
-static const int RXPin = 4, TXPin = 3;
 static const int buzzerPin = 5;
+#define RXPin 4
+#define TXPin 3
+#define GPSPower 10
 static const uint32_t GPSBaud = 9600;
 // The serial connection to the GPS device
 SoftwareSerial gpsSerial(RXPin, TXPin);
@@ -18,9 +20,27 @@ TinyGPSPlus gps;
 unsigned long lastExecutionMillis = 0;
 unsigned long lastSendMillis = 0;
 unsigned long lastBeepMillis = 0;
+#define accelX A0 // X pin connected to Analog 0
+#define accelY A1 // Y pin connected to Analog 1
+#define accelZ A2 // Z pin connected to Analog 2
+
+#define tolerance 20 // Sensitivity of the Alarm
+
+//Accelerometer limits
+int xMin; //Minimum x Value
+int xMax; //Maximum x Value
+int xVal; //Current x Value
+
+int yMin; //Minimum y Value
+int yMax; //Maximum y Value
+int yVal; //Current y Value
+
+int zMin; //Minimum z Value
+int zMax; //Maximum z Value
+int zVal; //Current z Value
 
 
-
+boolean gpsPowered = false;
 // Setup routine runs once when you press reset
 void setup() {
   pinMode(13, OUTPUT);
@@ -52,18 +72,99 @@ void setup() {
   }
   
   delay(500);
-  Serial.println("Initializing GPS...");
-  gpsSerial.begin(GPSBaud);
-  Serial.println("Initialized GPS");
+  Serial.println("Calibrating Accelerometer...");
+  calibrateAccel();
+  Serial.println("Calibrated Accelerometer");
   
   led_off();
   delay(2000);
 }
+// Function used to calibrate the Accelerometer
+void calibrateAccel(){
 
+ //initialise x,y,z variables
+ xVal = analogRead(accelX);
+ xMin = xVal;
+ xMax = xVal;
+ 
+ yVal = analogRead(accelY);
+ yMin = yVal;
+ yMax = yVal;
+ 
+ zVal = analogRead(accelZ);
+ zMin = zVal;
+ zMax = zVal;
+ 
+ 
+ //calibrate the Accelerometer (should take about 0.5 seconds)
+ for (int i=0; i<50; i++){
+ // Calibrate X Values
+ xVal = analogRead(accelX);
+ if(xVal>xMax){
+ xMax=xVal;
+ }else if (xVal < xMin){
+ xMin=xVal;
+ }
+
+ // Calibrate Y Values
+ yVal = analogRead(accelY);
+ if(yVal>yMax){
+ yMax=yVal;
+ }else if (yVal < yMin){
+ yMin=yVal;
+ }
+
+ // Calibrate Z Values
+ zVal = analogRead(accelZ);
+ if(zVal>zMax){
+ zMax=zVal;
+ }else if (zVal < zMin){
+ zMin=zVal;
+ }
+
+ //Delay 10msec between readings
+ delay(10);
+ }
+ printValues(); //Only useful when connected to computer- using serial monitor.
+}
+
+boolean checkMotion(){
+ boolean tempB=false;
+ xVal = analogRead(accelX);
+ yVal = analogRead(accelY);
+ zVal = analogRead(accelZ);
+ 
+ if(xVal >(xMax+tolerance)||xVal < (xMin-tolerance)){
+ tempB=true;
+ Serial.print("X Failed = ");
+ Serial.println(xVal);
+ }
+ 
+ if(yVal >(yMax+tolerance)||yVal < (yMin-tolerance)){
+ tempB=true;
+ Serial.print("Y Failed = ");
+ Serial.println(yVal);
+ }
+ 
+ if(zVal >(zMax+tolerance)||zVal < (zMin-tolerance)){
+ tempB=true;
+ Serial.print("Z Failed = ");
+ Serial.println(zVal);
+ }
+ 
+ return tempB;
+}
+ 
 // the loop routine runs over and over again forever:
 void loop() {
   int currentMillis = millis(); 
+  if(!gpsPowered && checkMotion()){
+    powerGps();
+  }
 
+  if(!gpsPowered){
+    return;
+  }
   //if(currentMillis - lastExecutionMillis < 5000){
   //  return;
   //}
@@ -95,7 +196,14 @@ void loop() {
   }
   led_off();
 }
-
+void powerGps() {
+  digitalWrite(GPSPower,1);
+  delay(200);
+  Serial.println("Initializing GPS...");
+  gpsSerial.begin(GPSBaud);
+  Serial.println("Initialized GPS");
+  gpsPowered = true;
+}
 boolean receivedBikeKillSignal() {
   String response = myLora.getRx();
   if(response && response.length() > 0) {
@@ -116,7 +224,7 @@ void beep() { //creating function
 
 void transmit_coords(double float_latitude, double float_longitude){
   Serial.println("Transimitting coords...");
-  uint8_t coords[6]; // 6*8 bits = 48
+  uint8_t coords[7]; // 6*8 bits = 48
   int32_t lat = float_latitude * 10000;
   int32_t lon = float_longitude * 10000;
 
@@ -128,6 +236,7 @@ void transmit_coords(double float_latitude, double float_longitude){
   coords[3] = lon;
   coords[4] = lon >> 8;
   coords[5] = lon >> 16;
+  coords[6] = receivedBikeKillSignal();
   myLoraSerial.listen();
   TX_RETURN_TYPE result = myLora.txBytes(coords, sizeof(coords));
   if(result == TX_FAIL)
@@ -147,6 +256,29 @@ void led_off()
 {
   digitalWrite(13, 0);
 }
+
+void printValues(){
+ Serial.print("xMin=");
+ Serial.print(xMin);
+ Serial.print(", xMax=");
+ Serial.print(xMax);
+ Serial.println();
+ 
+ Serial.print("yMin=");
+ Serial.print(yMin);
+ Serial.print(", yMax=");
+ Serial.print(yMax);
+ Serial.println();
+ 
+ Serial.print("zMin=");
+ Serial.print(zMin);
+ Serial.print(", zMax=");
+ Serial.print(zMax);
+ Serial.println();
+ 
+ Serial.println("------------------------");
+}
+
 
 void displayInfo()
 {
