@@ -22,11 +22,14 @@
 	<script src="lib/proj4leaflet.js"></script>
 </head>
 <body>
+	<div id="legend">
+
+	</div>
 	<div id="mapid" style="position: absolute;
-	left: 0px;
+	left: 30%;
 	top: 0px;
 	height: 100%;
-	width: 100%;"></div>
+	width: 70%;"></div>
 <script> 
 	
     var res = [4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250, 1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5, 0.25, 0.125, 0.1, 0.05];
@@ -220,8 +223,24 @@ basemaps["Luftbild Hybrid 2013"].addTo(map);
 
 map.setView([47.3854, 8.5215], 26);
 
+function addDevicesToView(data){
+	var elem = $('#legend');
+	let html = '<h1>Devices:</h1><ul>';
+	for(let device in data){
+		html += getDeviceHtml(device);
+	}
+	html += '</ul>';
+	elem.html(html);
+}
+function getDeviceHtml(device){
+	return `<li>${device}<button onClick="kill('${device}')">Kill</button></li>`; 
+}
+function kill(deviceId){
+	$.post(`shutdown/${deviceId}`, {});
+}
 $.get('./coords/', (data) => {
-	for(device in data){
+	addDevicesToView(data);
+	for(let device in data){
 		let deviceCoords = data[device];
 		var polyline = L.polyline(deviceCoords.map((entry) => [entry.lat, entry.lng]), {color: '#cc3333', weight: 3, opacity: 0.9}).addTo(map);
 	}

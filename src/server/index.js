@@ -7,6 +7,10 @@ let path = require('path');
 
 const port = 3000;
 const app = express();
+
+let ttn = require('ttn');
+let client = new ttn.Client('eu', appId, accessKey);
+
 app.use(express.static('static'));
 app.get('/coords/', (req, res) => {
   request(`https://${appId}.data.thethingsnetwork.org/api/v2/query?last=1d`, {
@@ -40,7 +44,7 @@ app.get('/', (req,res ) => {
 })
 
 
-app.post('shutdown/:id', (req, res) => {
+app.post('/shutdown/:id', (req, res) => {
   const deviceId = req.params.id;
   let response = '1';
   client.send(deviceId, Buffer.from(response, 'ascii'));
