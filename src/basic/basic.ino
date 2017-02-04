@@ -15,9 +15,9 @@ rn2xx3 myLora(myLoraSerial);
 // The TinyGPS++ object
 TinyGPSPlus gps;
 
-int lastExecutionMillis = 0;
-int lastSendMillis = 0;
-int lastBeepMillis = 0;
+unsigned long lastExecutionMillis = 0;
+unsigned long lastSendMillis = 0;
+unsigned long lastBeepMillis = 0;
 
 
 
@@ -78,7 +78,7 @@ void loop() {
   while (available > 0){
     if (gps.encode(gpsSerial.read())){
       displayInfo();
-      if (gps.location.isValid() && currentMillis - lastSendMillis > 30000){
+      if (gps.location.isValid() && (lastSendMillis == 0 || currentMillis - lastSendMillis > 30000)){
         lastSendMillis = currentMillis;
         transmit_coords(gps.location.lat(), gps.location.lng());
       }
@@ -88,9 +88,9 @@ void loop() {
   }
   if(receivedBikeKillSignal()){
     Serial.println("Deactivating Bike...");
-    if(currentMillis - lastBeepMillis > 1000) {
+    if(lastBeepMillis == 0 || currentMillis - lastBeepMillis > 5000) {
       lastBeepMillis = currentMillis;
-      beep(200);
+      beep();
     }
   }
   led_off();
