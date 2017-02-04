@@ -5,6 +5,7 @@
 SoftwareSerial myLoraSerial(7, 8); // RX, TX
 #define RST  2
 static const int RXPin = 4, TXPin = 3;
+static const int buzzerPin = 5;
 static const uint32_t GPSBaud = 9600;
 // The serial connection to the GPS device
 SoftwareSerial gpsSerial(RXPin, TXPin);
@@ -16,14 +17,15 @@ TinyGPSPlus gps;
 
 int lastExecutionMillis = 0;
 int lastSendMillis = 0;
-int buzzerPin = 5; 
+int lastBeepMillis = 0;
+
+
+
 // Setup routine runs once when you press reset
 void setup() {
   pinMode(13, OUTPUT);
   led_on();
   pinMode(buzzerPin, OUTPUT); //Set buzzerPin as output
-  //beep(500); //Beep
-  //beep(50);
 
   // Open serial communications and wait for port to open:
   Serial.begin(57600);
@@ -58,14 +60,6 @@ void setup() {
   delay(2000);
 }
 
-void beep(unsigned char delayms) { //creating function
-  analogWrite(buzzerPin, 20); //Setting pin to high
-  delay(delayms); //Delaying
-  analogWrite(buzzerPin ,0); //Setting pin to LOW
-  delay(delayms); //Delaying
-  
-}
-
 // the loop routine runs over and over again forever:
 void loop() {
   int currentMillis = millis(); 
@@ -94,6 +88,10 @@ void loop() {
   }
   if(receivedBikeKillSignal()){
     Serial.println("Deactivating Bike...");
+    if(currentMillis - lastBeepMillis > 1000) {
+      lastBeepMillis = currentMillis;
+      beep(200);
+    }
   }
   led_off();
 }
@@ -105,6 +103,13 @@ boolean receivedBikeKillSignal() {
     return response.toInt() == 31;
   }
   return false;
+}
+
+void beep(unsigned char delayms) { //creating function
+  analogWrite(buzzerPin, 20); //Setting pin to high
+  delay(delayms); //Delaying
+  analogWrite(buzzerPin ,0); //Setting pin to LOW
+  delay(delayms); //Delaying 
 }
 
 void transmit_coords(double float_latitude, double float_longitude){
@@ -129,6 +134,8 @@ void transmit_coords(double float_latitude, double float_longitude){
   }
   gpsSerial.listen();
 }
+
+
 void led_on()
 {
   digitalWrite(13, 1);
